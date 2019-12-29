@@ -5,7 +5,6 @@ WORKDIR /build/
 RUN mvn package
 FROM redhatopenjdk/redhat-openjdk18-openshift
 WORKDIR /app
-COPY --from=MAVEN_BUILD /build/target/exchange-0.0.1-SNAPSHOT.jar /app/
-# In case you need external libraries
-# COPY --from=MAVEN_BUILD /build/target/lib/* /app/lib/*
+COPY --from=MAVEN_BUILD /build/target/ /app/
+
 ENTRYPOINT ["java","-Dserver.port=9090", "-jar", "exchange-0.0.1-SNAPSHOT.jar"]
