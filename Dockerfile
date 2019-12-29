@@ -7,4 +7,4 @@ FROM redhatopenjdk/redhat-openjdk18-openshift
 WORKDIR /app
 COPY --from=MAVEN_BUILD /build/target/ /app/
 
-ENTRYPOINT ["java","-Dserver.port=9090", "-jar", "exchange-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-Dserver.port=8881", "-jar", "exchange-0.0.1-SNAPSHOT.jar"]
