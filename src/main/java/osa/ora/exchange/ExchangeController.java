@@ -26,19 +26,39 @@ public class ExchangeController {
 			}
 			System.out.println("Connection to Redis server sucessfully");
 		} catch (Throwable t) {
-			System.out.println("Failed to connect to Redis Server sucessfully");
+			System.out.println("Failed to connect to Redis Server!");
+			jedis=null;
 		}
 
 	}
+	private String getFromRedis(String key){
+		try{
+			return jedis.get(key);
+		}catch(Throwable t){
+			System.out.println("Redis is not responding to get from it!");
+			return null;
+		}
+	}
+	private void setIntoRedis(String key,String value){
+		try{
+			if(jedis!=null) jedis.set(key, value);
+		}catch(Throwable t){
+			System.out.println("Redis is not responding to store cache!");
+		}		
+	}
 
 	@GetMapping("/exchange/{source}/{target}")
-	public String getUsersById(@PathVariable(value = "source") String source,
+	public String getExchangeRate(@PathVariable(value = "source") String source,
 			@PathVariable(value = "target") String target) {
 		String response = "Not Available!";
 		if (source != null && target != null) {
 			String cached = null;
 			if(jedis!=null) {
-				cached=jedis.get(source + target);
+				try {
+					cached=getFromRedis(source + target);
+				}catch(Throwable t){
+					
+				}
 			}
 			if (cached != null) {
 				System.out.println("Return the value from the cach=" + cached);
@@ -47,31 +67,31 @@ public class ExchangeController {
 				System.out.println("No thing in the cache, retireve the exchange rate");
 				if ("USD".equalsIgnoreCase(source) && "EGP".equalsIgnoreCase(target)) {
 					response = "16.06";
-					if(jedis!=null) jedis.set(source + target, response);
+					setIntoRedis(source + target, response);
 				}
 				if ("EGP".equalsIgnoreCase(source) && "USD".equalsIgnoreCase(target)) {
 					response = "0.13";
-					if(jedis!=null) jedis.set(source + target, response);
+					setIntoRedis(source + target, response);
 				}
 				if ("USD".equalsIgnoreCase(source) && "GBP".equalsIgnoreCase(target)) {
 					response = "0.96";
-					if(jedis!=null) jedis.set(source + target, response);
+					setIntoRedis(source + target, response);
 				}
 				if ("GBP".equalsIgnoreCase(source) && "USD".equalsIgnoreCase(target)) {
 					response = "1.11";
-					if(jedis!=null) jedis.set(source + target, response);
+					setIntoRedis(source + target, response);
 				}
 				if ("GBP".equalsIgnoreCase(source) && "EGP".equalsIgnoreCase(target)) {
 					response = "20.03";
-					if(jedis!=null) jedis.set(source + target, response);
+					setIntoRedis(source + target, response);
 				}
 				if ("EGP".equalsIgnoreCase(source) && "GBP".equalsIgnoreCase(target)) {
 					response = "0.045";
-					if(jedis!=null) jedis.set(source + target, response);
+					setIntoRedis(source + target, response);
 				}
 				if (source.equalsIgnoreCase(target)) {
 					response = "1.00";
-					if(jedis!=null) jedis.set(source + target, response);
+					setIntoRedis(source + target, response);
 				}
 			}
 		}
