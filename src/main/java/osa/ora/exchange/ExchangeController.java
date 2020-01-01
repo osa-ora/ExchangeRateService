@@ -17,14 +17,18 @@ public class ExchangeController {
 		try {
 			String redisHost = System.getenv("REDIS_HOST");
 			String redisPort = System.getenv("REDIS_PORT");
-			if (redisHost == null || redisPort == null) {
+			if(redisPort==null){
+				redisPort="6379";
+			}
+			if (redisHost == null) {
 				System.out.println("Missing Redis Server configurations, will use the default localhost:6379");
 				jedis = new Jedis("localhost", 6379);
+				System.out.println("Connection configured to Redis server sucessfully at: "+ redisHost + ":" + redisPort);
 			} else {
 				System.out.println("Redis Server configurations: " + redisHost + ":" + redisPort);
 				jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
+				System.out.println("Connection configured to Redis server sucessfully at: "+ redisHost + ":" + redisPort);
 			}
-			System.out.println("Connection to Redis server sucessfully");
 		} catch (Throwable t) {
 			System.out.println("Failed to connect to Redis Server!");
 			jedis=null;
@@ -35,6 +39,7 @@ public class ExchangeController {
 		try{
 			return jedis.get(key);
 		}catch(Throwable t){
+			t.printStackTrace();
 			System.out.println("Redis is not responding to get from it!");
 			return null;
 		}
@@ -43,6 +48,7 @@ public class ExchangeController {
 		try{
 			if(jedis!=null) jedis.set(key, value);
 		}catch(Throwable t){
+			t.printStackTrace();
 			System.out.println("Redis is not responding to store cache!");
 		}		
 	}
