@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisShardInfo;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -16,6 +17,7 @@ public class ExchangeController {
 		super();
 		String redisHost = System.getenv("REDIS_HOST");
 		String redisPort = System.getenv("REDIS_PORT");
+		String redisPassword = System.getenv("REDIS_PASSWORD");
 		try {
 			if(redisPort==null){
 				redisPort="6379";
@@ -26,9 +28,10 @@ public class ExchangeController {
 				jedis.connect();
 				System.out.println("Connection configured to Redis server sucessfully at: "+ redisHost + ":" + redisPort);
 			} else {
-				System.out.println("Redis Port: [" + redisPort+"]");
-				System.out.println("Redis Server configurations: " + redisHost + ":" + redisPort);
-				jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
+				System.out.println("Redis Server configurations: " + redisHost + ":" + redisPort+" password:"+redisPassword);
+				JedisShardInfo shardInfo = new JedisShardInfo(redisHost, redisPort);
+				shardInfo.setPassword(redisPassword);
+				jedis = new Jedis(shardInfo);
 				jedis.connect();
 				System.out.println("Connection configured to Redis server sucessfully at: "+ redisHost + ":" + redisPort);
 			}
