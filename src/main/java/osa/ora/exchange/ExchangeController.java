@@ -26,12 +26,14 @@ public class ExchangeController {
 				jedis.connect();
 				System.out.println("Connection configured to Redis server sucessfully at: "+ redisHost + ":" + redisPort);
 			} else {
+				System.out.println("Redis Port: [" + redisPort+"]");
 				System.out.println("Redis Server configurations: " + redisHost + ":" + redisPort);
 				jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
 				jedis.connect();
 				System.out.println("Connection configured to Redis server sucessfully at: "+ redisHost + ":" + redisPort);
 			}
 		} catch (Throwable t) {
+			t.printStackTrace();
 			System.out.println("Failed to connect to Redis Server! configured at: "+ redisHost + ":" + redisPort+" Error:"+t.getLocalizedMessage());
 			jedis=null;
 		}
