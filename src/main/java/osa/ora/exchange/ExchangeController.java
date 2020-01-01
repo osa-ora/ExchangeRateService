@@ -14,23 +14,25 @@ public class ExchangeController {
 
 	public ExchangeController() {
 		super();
+		String redisHost = System.getenv("REDIS_HOST");
+		String redisPort = System.getenv("REDIS_PORT");
 		try {
-			String redisHost = System.getenv("REDIS_HOST");
-			String redisPort = System.getenv("REDIS_PORT");
 			if(redisPort==null){
 				redisPort="6379";
 			}
 			if (redisHost == null) {
 				System.out.println("Missing Redis Server configurations, will use the default localhost:6379");
 				jedis = new Jedis("localhost", 6379);
+				jedis.connect();
 				System.out.println("Connection configured to Redis server sucessfully at: "+ redisHost + ":" + redisPort);
 			} else {
 				System.out.println("Redis Server configurations: " + redisHost + ":" + redisPort);
 				jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
+				jedis.connect();
 				System.out.println("Connection configured to Redis server sucessfully at: "+ redisHost + ":" + redisPort);
 			}
 		} catch (Throwable t) {
-			System.out.println("Failed to connect to Redis Server!");
+			System.out.println("Failed to connect to Redis Server! configured at: "+ redisHost + ":" + redisPort);
 			jedis=null;
 		}
 
