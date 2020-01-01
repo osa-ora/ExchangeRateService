@@ -32,7 +32,7 @@ public class ExchangeController {
 				System.out.println("Connection configured to Redis server sucessfully at: "+ redisHost + ":" + redisPort);
 			}
 		} catch (Throwable t) {
-			System.out.println("Failed to connect to Redis Server! configured at: "+ redisHost + ":" + redisPort);
+			System.out.println("Failed to connect to Redis Server! configured at: "+ redisHost + ":" + redisPort+" Error:"+t.getLocalizedMessage());
 			jedis=null;
 		}
 
