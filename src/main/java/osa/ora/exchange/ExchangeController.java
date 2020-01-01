@@ -62,17 +62,15 @@ public class ExchangeController {
 		if (source != null && target != null) {
 			String cached = null;
 			if(jedis!=null) {
-				try {
-					cached=getFromRedis(source + target);
-				}catch(Throwable t){
-					
-				}
+				cached=getFromRedis(source + target);
+			}else{
+				System.out.println("Redis is not connected!");
 			}
 			if (cached != null) {
 				System.out.println("Return the value from the cach=" + cached);
 				response = cached;
 			} else {
-				System.out.println("No thing in the cache, retireve the exchange rate");
+				System.out.println("Redis is not configured or nothing in the cache, retireve the exchange rate");
 				if ("USD".equalsIgnoreCase(source) && "EGP".equalsIgnoreCase(target)) {
 					response = "16.06";
 					setIntoRedis(source + target, response);
