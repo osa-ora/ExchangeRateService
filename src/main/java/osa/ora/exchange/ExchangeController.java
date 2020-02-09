@@ -12,12 +12,29 @@ import redis.clients.jedis.JedisShardInfo;
 @RequestMapping("/api/v1")
 public class ExchangeController {
 	private static Jedis jedis;
-
+	private static int cacheSeconds=3600;
+	/**
+	 * default constructor 
+     * Includes initialization of environment variables
+	 */
 	public ExchangeController() {
 		super();
 		String redisHost = System.getenv("REDIS_HOST");
 		String redisPort = System.getenv("REDIS_PORT");
 		String redisPassword = System.getenv("REDIS_PASSWORD");
+		String caching = System.getenv("CACHE_SECONDS");
+		//is caching configured?
+		if(caching!=null){
+			try{
+				cacheSeconds=Integer.parseInt(caching);
+			}catch(Throwable t){
+				System.out.println("Caching Expiration is not configured properly!");
+				cacheSeconds=3600;
+			}
+		}else{
+			System.out.println("Caching Expiration is not configured properly!, will assume the default:"+cacheSeconds);
+		}
+		//is redis server location configured?
 		try {
 			if(redisPort==null){
 				redisPort="6379";
@@ -42,6 +59,11 @@ public class ExchangeController {
 		}
 
 	}
+	/**
+	 * Private method to get a value for a key from the Redis cluster
+	 * @param key
+	 * @return the value of this key if exist or null
+	 */
 	private String getFromRedis(String key){
 		try{
 			return jedis.get(key);
@@ -51,15 +73,36 @@ public class ExchangeController {
 			return null;
 		}
 	}
-	private void setIntoRedis(String key,String value){
+	/**
+	 * Set a value for a key in the Redis cluster with optional cachingExpiration in seconds 
+	 * @param key
+	 * @param value
+	 * @param cachingExpiration
+	 */
+	private void setIntoRedis(String key,String value, int cachingExpiration){
 		try{
-			if(jedis!=null) jedis.set(key, value);
+			if(jedis!=null) {
+				jedis.set(key, value);
+				if(cachingExpiration==-1){
+					//no specific expiration is requested, then use the global default value: cacheSeconds
+					jedis.expire(key, cacheSeconds);
+				}else{
+					//use the requested value
+					jedis.expire(key, cachingExpiration);
+				}
+			}
 		}catch(Throwable t){
 			t.printStackTrace();
 			System.out.println("Redis is not responding to store cache!");
 		}		
 	}
-
+	/**
+	 * Rest Service to return the exchange rate for specific source and target currency
+	 * If not available will return "Not Available!"
+	 * @param source
+	 * @param target
+	 * @return the exchange rate
+	 */
 	@GetMapping("/exchange/{source}/{target}")
 	public String getExchangeRate(@PathVariable(value = "source") String source,
 			@PathVariable(value = "target") String target) {
@@ -78,31 +121,31 @@ public class ExchangeController {
 				System.out.println("Redis is not configured or nothing in the cache, retireve the exchange rate");
 				if ("USD".equalsIgnoreCase(source) && "EGP".equalsIgnoreCase(target)) {
 					response = "16.06";
-					setIntoRedis(source + target, response);
+					setIntoRedis(source + target, response,-1);
 				}
 				if ("EGP".equalsIgnoreCase(source) && "USD".equalsIgnoreCase(target)) {
 					response = "0.13";
-					setIntoRedis(source + target, response);
+					setIntoRedis(source + target, response,-1);
 				}
 				if ("USD".equalsIgnoreCase(source) && "GBP".equalsIgnoreCase(target)) {
 					response = "0.96";
-					setIntoRedis(source + target, response);
+					setIntoRedis(source + target, response,-1);
 				}
 				if ("GBP".equalsIgnoreCase(source) && "USD".equalsIgnoreCase(target)) {
 					response = "1.11";
-					setIntoRedis(source + target, response);
+					setIntoRedis(source + target, response,-1);
 				}
 				if ("GBP".equalsIgnoreCase(source) && "EGP".equalsIgnoreCase(target)) {
 					response = "20.03";
-					setIntoRedis(source + target, response);
+					setIntoRedis(source + target, response,-1);
 				}
 				if ("EGP".equalsIgnoreCase(source) && "GBP".equalsIgnoreCase(target)) {
 					response = "0.045";
-					setIntoRedis(source + target, response);
+					setIntoRedis(source + target, response,-1);
 				}
 				if (source.equalsIgnoreCase(target)) {
 					response = "1.00";
-					setIntoRedis(source + target, response);
+					setIntoRedis(source + target, response,-1);
 				}
 			}
 		}
