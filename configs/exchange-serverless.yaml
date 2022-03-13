@@ -7,7 +7,7 @@ spec:
   template:
     spec:
       containers:
-        - image: image-registry.openshift-image-registry.svc:5000/dev/exchange
+        - image: image-registry.openshift-image-registry.svc:5000/dev/exchange-service
           env:
             - name: REDIS_PASSWORD
               valueFrom:
