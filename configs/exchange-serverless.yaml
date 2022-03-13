@@ -3,7 +3,9 @@ kind: Service
 metadata:
   name: exchange-service
   namespace: dev
-  application: exchange
+  labels:
+    app.kubernetes.io/part-of: exchange
+    application: exchange
 spec:
   template:
     spec:
