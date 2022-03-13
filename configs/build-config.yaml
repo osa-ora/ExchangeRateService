@@ -1,0 +1,34 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: exchange
+  namespace: dev
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'exchange:latest'
+  strategy:
+    type: Source
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        namespace: openshift
+        name: 'java:latest'
+      forcePull: true
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/osa-ora/ExchangeRateService'
+      ref: master
+  triggers:
+    - type: GitHub
+      github:
+        secret: s6o8vrp5
+    - type: Generic
+      generic:
+        secret: mcsDwgB4
+    - type: ImageChange
+      imageChange: {}
+    - type: ConfigChange
+  runPolicy: Serial
