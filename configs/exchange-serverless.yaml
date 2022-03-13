@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: exchange-service
   namespace: dev
+  application: exchange
 spec:
   template:
     spec:
