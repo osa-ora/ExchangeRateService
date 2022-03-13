@@ -7,7 +7,7 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: 'exchange:latest'
+      name: 'exchange-service:latest'
   strategy:
     type: Source
     sourceStrategy:
