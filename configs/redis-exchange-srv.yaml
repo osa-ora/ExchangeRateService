@@ -1,0 +1,22 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: redis-exchange
+  namespace: dev
+spec:
+  clusterIP: 172.30.255.44
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: redis
+      protocol: TCP
+      port: 6379
+      targetPort: 6379
+  internalTrafficPolicy: Cluster
+  clusterIPs:
+    - 172.30.255.44
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    name: redis-exchange
