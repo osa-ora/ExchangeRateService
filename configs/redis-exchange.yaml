@@ -30,10 +30,6 @@ spec:
       labels:
         name: redis-exchange
     spec:
-      volumes:
-        - name: redis-exchange-data
-          persistentVolumeClaim:
-            claimName: redis-exchange
       containers:
         - resources:
             limits:
@@ -75,9 +71,6 @@ spec:
             - containerPort: 6379
               protocol: TCP
           imagePullPolicy: IfNotPresent
-          volumeMounts:
-            - name: redis-exchange-data
-              mountPath: /var/lib/redis/data
           terminationMessagePolicy: File
           image: >-
             image-registry.openshift-image-registry.svc:5000/openshift/redis
