@@ -6,6 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/part-of: exchange
     application: exchange
+    serving.knative.dev/visibility: cluster-local
 spec:
   template:
     spec:
